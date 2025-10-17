@@ -195,7 +195,7 @@ def evaluate_grasp_giga(sim, candidate):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path,default=Path("data/data_pile_train_raw"))
+    parser.add_argument("--root", type=Path,default=Path("labeled_data/labeled_data_raw"))
     parser.add_argument("--scene", type=str, choices=["pile", "packed"], default="pile")
     parser.add_argument("--object-set", type=str, default="pile")
     parser.add_argument("--num-grasps", type=int, default=10000)

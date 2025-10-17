@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 import pybullet
 from pybullet_utils import bullet_client
+import imageio.v3 as iio
 
 from utils.transform import Rotation, Transform
 from utils.saver import get_mesh_pose_dict_from_world

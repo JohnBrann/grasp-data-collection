@@ -185,7 +185,7 @@ def evaluate_grasp_point(sim, pos, normal, num_rotations=6):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path,default=Path("data/data_pile_train_raw"))
+    parser.add_argument("--root", type=Path,default=Path("labeled_data"))
     parser.add_argument("--scene", type=str, choices=["pile", "packed"], default="pile")
     parser.add_argument("--object-set", type=str, default="pile")
     parser.add_argument("--num-grasps", type=int, default=10000)
@@ -195,6 +195,13 @@ if __name__ == "__main__":
     parser.add_argument("--random", action="store_true", help="Add distrubation to camera pose")
     parser.add_argument("--sim-gui", action="store_true")
     args = parser.parse_args()
+
+    dataset_name = Path(args.object_set).name
+    print(f"args.root: {args.root}")
+    args.root = args.root / dataset_name
+    print(f"args.root: {args.root}")
+
+
     args.save_scene = True
     if args.num_proc > 1:
         pool = mp.Pool(processes=args.num_proc)

@@ -2,7 +2,8 @@
 
 MODE=${1:-graspnet}
 SCENE=${2:-"pile"}
-SAVE_DIR=${3:-"data/data_pile_train_raw"}  
+OBJECT_SET=${} ### start here, fix this!!!
+SAVE_DIR=${3:-"labeled_data/labeled_data_raw"}  
 GRASP_NUM=${4:-2000000}  
 RANDOM_CAM=${5:-"True"}
 

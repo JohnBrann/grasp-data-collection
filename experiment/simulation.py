@@ -44,7 +44,7 @@ class ClutterRemovalSim(object):
     def __init__(self, scene, object_set, gui=True, seed=None, add_noise=False, sideview=False, save_dir=None, save_freq=8):
         assert scene in ["pile", "packed", "real_packed","real_pile"]
 
-        self.urdf_root = Path("data/urdfs")
+        self.urdf_root = Path("object_sets")
         self.scene = scene
         self.object_set = object_set
         self.discover_objects()
@@ -450,7 +450,7 @@ class Gripper(object):
 
     def __init__(self, world):
         self.world = world
-        self.urdf_path = Path("data/urdfs/panda/hand.urdf")
+        self.urdf_path = Path("object_sets/panda/hand.urdf")
 
         self.max_opening_width = 0.08
         self.finger_depth = 0.05

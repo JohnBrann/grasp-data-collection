@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--scene', type=str, default="pile")
-    parser.add_argument('--root', type=Path, default=Path("data/data_pile_train_raw"))
+    parser.add_argument('--root', type=Path, default=Path("labeled_data/labeled_data_raw"))
     # Visualization
     parser.add_argument('--GUI', type=strToBool, default=True)
     parser.add_argument('--show_grasp_points', type=strToBool, default=False)
