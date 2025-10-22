@@ -77,7 +77,7 @@ def main(args, rank):
             grasp, label = evaluate_grasp_point(sim, point, normal)
 
             # store the sample
-            # write_grasp(args.root, scene_id, grasp, label)
+            write_grasp(args.root, scene_id, grasp, label)
             pbar.update()
 
     pbar.close()
