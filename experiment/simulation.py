@@ -71,10 +71,18 @@ class ClutterRemovalSim(object):
     @property
     def num_objects(self):
         return max(0, self.world.p.getNumBodies() - 1)  # remove table from body count
+    
+    # def discover_objects(self):
+    #     root = self.urdf_root / self.object_set
+    #     self.object_urdfs = [f for f in root.iterdir() if f.suffix == ".urdf"]
 
+    # Discovers objects in the structure expected from MOAD datasets
     def discover_objects(self):
         root = self.urdf_root / self.object_set
-        self.object_urdfs = [f for f in root.iterdir() if f.suffix == ".urdf"]
+        self.object_urdfs = sorted(
+            (p for p in root.glob("*/fused/*.urdf") if p.is_file()),
+            key=lambda p: p.stem
+        )
 
     def save_state(self):
         self._snapshot_id = self.world.save_state()
