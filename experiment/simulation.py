@@ -443,6 +443,19 @@ class ClutterRemovalSim(object):
         contacts = self.world.get_contacts(gripper.body)
         res = len(contacts) > 0 and gripper.read() > 0.1 * gripper.max_opening_width
         return res
+    
+
+    def idle(self, hz=240):
+        """Keep the sim running without executing any grasps."""
+        import time
+        print("Scene spawned. Press Ctrl+C to exit.")
+        try:
+            while True:
+                self.world.step()          # uses btsim.BtWorld.step()
+                time.sleep(1.0 / hz)       # gentle throttle
+        except KeyboardInterrupt:
+            pass
+
 
 
 class Gripper(object):

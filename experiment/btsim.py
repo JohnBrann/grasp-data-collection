@@ -292,31 +292,78 @@ class Camera(object):
         self.proj_matrix = _build_projection_matrix(intrinsic, near, far)
         self.p = physics_client
 
-    def render(self, extrinsic):
-        """Render synthetic RGB and depth images.
+    # def render(self, extrinsic):
+    #     """Render synthetic RGB and depth images.
 
+    #     Args:
+    #         extrinsic: Extrinsic parameters, T_cam_ref.
+    #     """
+    #     # Construct OpenGL compatible view and projection matrices.
+    #     gl_view_matrix = extrinsic.as_matrix()
+    #     gl_view_matrix[2, :] *= -1  # flip the Z axis
+    #     gl_view_matrix = gl_view_matrix.flatten(order="F")
+    #     gl_proj_matrix = self.proj_matrix.flatten(order="F")
+
+    #     result = self.p.getCameraImage(
+    #         width=self.intrinsic.width,
+    #         height=self.intrinsic.height,
+    #         viewMatrix=gl_view_matrix,
+    #         projectionMatrix=gl_proj_matrix,
+    #         renderer=pybullet.ER_TINY_RENDERER,
+    #     )
+
+    #     rgb, z_buffer = result[2][:, :, :3], result[3]
+    #     depth = (
+    #         1.0 * self.far * self.near / (self.far - (self.far - self.near) * z_buffer)
+    #     )
+    #     return rgb, depth
+    
+
+    def render(self, extrinsic, return_seg: bool = False, renderer=None):
+        """
         Args:
             extrinsic: Extrinsic parameters, T_cam_ref.
+            return_seg: If True, also return a segmentation mask (int image).
+        Returns:
+            (rgb, depth) or (rgb, depth, seg)
         """
-        # Construct OpenGL compatible view and projection matrices.
+        # OpenGL-style view/proj
         gl_view_matrix = extrinsic.as_matrix()
-        gl_view_matrix[2, :] *= -1  # flip the Z axis
+        gl_view_matrix[2, :] *= -1  # flip Z
         gl_view_matrix = gl_view_matrix.flatten(order="F")
         gl_proj_matrix = self.proj_matrix.flatten(order="F")
 
+        # Choose renderer; OpenGL is faster and supports seg well
+        if renderer is None:
+            renderer = pybullet.ER_BULLET_HARDWARE_OPENGL  # fallback to TINY if needed
+
+        flags = 0
+        if return_seg:
+            flags |= pybullet.ER_SEGMENTATION_MASK_OBJECT_AND_LINKINDEX
+
+        w, h = self.intrinsic.width, self.intrinsic.height
         result = self.p.getCameraImage(
-            width=self.intrinsic.width,
-            height=self.intrinsic.height,
+            width=w,
+            height=h,
             viewMatrix=gl_view_matrix,
             projectionMatrix=gl_proj_matrix,
-            renderer=pybullet.ER_TINY_RENDERER,
+            renderer=renderer,
+            flags=flags,
         )
 
-        rgb, z_buffer = result[2][:, :, :3], result[3]
-        depth = (
-            1.0 * self.far * self.near / (self.far - (self.far - self.near) * z_buffer)
-        )
-        return rgb, depth
+        # result: (w, h, rgba, depth_buffer, seg_buffer)
+        rgba = result[2][:, :, :3].astype(np.uint8)
+        z_buffer = result[3].astype(np.float32)
+
+        # Convert z-buffer to metric depth
+        near, far = self.near, self.far
+        depth = (far * near) / (far - (far - near) * z_buffer)
+
+        if return_seg:
+            seg = np.array(result[4], dtype=np.int32)  # shape (h, w)
+            return rgba, depth, seg
+        else:
+            return rgba, depth
 
 
 def _build_projection_matrix(intrinsic, near, far):

@@ -8,7 +8,7 @@ docker run -it --rm --gpus all \
   -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
   -e DISPLAY="$DISPLAY" \
   --workdir /grasp-data-collection \
-  grasp-data-collection-dev \
+  grasp-data-collection \
   bash -lc '
     source /opt/conda/etc/profile.d/conda.sh && conda activate grasp-data-collection
     export PYTHONPATH="/grasp-data-collection/src:$PYTHONPATH";
