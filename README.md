@@ -1,4 +1,5 @@
 # Data Collection for Volumetric Grasping Models
+This repository provides added features from its original for ease of use for our labs data collection and testing purposes. Specifically dataset modularity for mass data collection and docker workflows.
 
 ## Installation
 
@@ -16,12 +17,102 @@ pip install -e .
 
 5. (Optional) You can install [graspnet-baseline](https://github.com/graspnet/graspnet-baseline) to speed up your data collection.
 
+## Docker Setup
+Pre-built image is hosted on Docker Hub:
+
+```bash
+docker pull johnbrann/grasp-data-collection
+```
+
+Contains:
+
+- The ability to collect training data for various 6DoF grasping algorithms. 
+
+## Requirements
+
+- Docker and/or Docker Compose installed on a Linux machine
+- Not tested outside of Linux, instructions are for Ubuntu but should work on any machine capable of running Docker
+
+## Setup Instructions
+
+### 1. Installing Docker & Compose on your machine
+
+```bash
+sudo apt update
+sudo apt install docker.io docker-compose
+```
+
+### 2. Clone the repository
+
+```bash
+git clone https://github.com/JohnBrann/grasp-data-collection
+cd grasp-data-collection
+```
+
+### 3. Start the container
+
+```bash
+docker-compose up -d
+```
+
+Then enter the container:
+
+```bash
+docker exec -it grasp-data-collection bash
+```
+
+#### 3.1 (Optional alternative: no docker compose)
+If you do not wish to use docker compose but still don't want to build the image yourself:
+
+<pre>
+# Enable X11 access from Docker containers
+xhost +local:docker
+
+# Run the container
+docker run -it --rm --gpus all \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+  -v "$HOME/vgn/data:/vgn/data:rw" \
+  grasp-data-collection
+</pre>
+
+#### 3.2  (Optional alternative: local image build)
+Lastly, if you wish to build the docker image yourself:
+
+<pre>
+# Build the image
+docker build -t grasp-data-collection:latest .
+
+# Enable X11 access from Docker containers
+xhost +local:docker
+  
+# Run the container
+docker run -it --rm --gpus all \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+  -v "$HOME/vgn/data:/vgn/data:rw" \
+  grasp-data-collection
+</pre>
+
+## Object Datasets
+
+This repository has been modified to work with the MOADv2 dataset. This dataset can be used and download at acces point [here] (https://github.com/pgavriel/MOADv2). After dowloaded the desired objects and creating the objects urdf files as stated in the linked repository, copy the entire folder into this repository into a folder named "object_sets". When generating data make sure to include the name of this folder as an argument i.e. --obeject-set <object-set name>
+
 ## Self-supervised Data Generation
 
 ### Raw synthetic grasping trials
 
+You can run these scripts to generate data
+
 ```bash
-./data_collection.sh (giga | graspnet | contact) (pile | packed) /path/to/raw/data num_grasps (True | False)
+python3 generate_data_giga.py --object-set <object_set>
+```
+
+
+```bash
+python3 generate_data_contact.py --object-set <object_set>
 ```
 
 Argument: 
