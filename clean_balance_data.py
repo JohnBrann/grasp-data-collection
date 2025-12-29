@@ -2,6 +2,7 @@ from pathlib import Path
 import argparse
 
 import numpy as np
+import pandas as pd
 
 from utils.io import *
 from utils.perception import *
@@ -30,17 +31,34 @@ def main(args):
     df.drop(df[df["z"] > 0.28].index, inplace=True)
     # write_df(df, root)
 
-    # balance
-    # df = read_df(root)
+    # balance (downsample majority to match minority)
     positives = df[df["label"] == 1]
     negatives = df[df["label"] == 0]
-    i = np.random.choice(negatives.index, len(negatives.index) - len(positives.index), replace=False)
-    df = df.drop(i)
+
+    n_pos = len(positives.index)
+    n_neg = len(negatives.index)
+
+    # reproducible behavior (optional)
+    np.random.seed(0)
+
+    if n_neg > n_pos:
+        # drop random negatives so negatives == positives
+        drop_count = n_neg - n_pos
+        drop_idx = np.random.choice(negatives.index, drop_count, replace=False)
+        df = df.drop(drop_idx)
+    elif n_pos > n_neg:
+        # drop random positives so positives == negatives
+        drop_count = n_pos - n_neg
+        drop_idx = np.random.choice(positives.index, drop_count, replace=False)
+        df = df.drop(drop_idx)
+    else:
+        # already balanced
+        pass
+
     write_df(df, root)
 
     # remove unreferenced scenes.
-    # df = read_df(root)
-    scenes = df["scene_id"].values
+    scenes = df["scene_id"].astype(str).values
     for f in (root / "scenes").iterdir():
         if f.suffix == ".npz" and f.stem not in scenes:
             print("Removed", f)

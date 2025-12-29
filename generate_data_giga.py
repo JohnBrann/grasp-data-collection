@@ -43,7 +43,8 @@ def main(args, rank):
 
     for _ in range(grasps_per_worker // GRASPS_PER_SCENE):
         # generate heap
-        object_count = np.random.poisson(OBJECT_COUNT_LAMBDA) + 1
+        # object_count = np.random.poisson(OBJECT_COUNT_LAMBDA) + 1
+        object_count = 3
         sim.reset(object_count)
         sim.save_state()
 
@@ -75,7 +76,6 @@ def main(args, rank):
             # sample and evaluate a grasp point
             point, normal = sample_grasp_point(pc, finger_depth)
             grasp, label = evaluate_grasp_point(sim, point, normal)
-
             # store the sample
             write_grasp(args.root, scene_id, grasp, label)
             pbar.update()

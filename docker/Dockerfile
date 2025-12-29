@@ -53,12 +53,14 @@ RUN echo 'source /opt/ros/noetic/setup.bash' >> /etc/bash.bashrc \
  && echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate grasp-data-collection' >> /etc/bash.bashrc
 
 # Workdir (mounted at runtime)
-WORKDIR /grasp-data-collection
+# WORKDIR /grasp-data-collection
 
 # Handy envs for X11 (optional but often helps)
 ENV QT_X11_NO_MITSHM=1
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,video,graphics,display
+
+RUN git clone https://github.com/JohnBrann/grasp-data-collection
 
 # ensure we’re installing into the conda env
 ENV PATH=/opt/conda/envs/grasp-data-collection/bin:$PATH
@@ -67,6 +69,12 @@ ENV PATH=/opt/conda/envs/grasp-data-collection/bin:$PATH
 RUN python -m pip install --no-cache-dir "Cython>=0.29" pybind11 cmake ninja "numpy<2.0"
 RUN pip install --no-cache-dir "scikit-image==0.20.0"
 RUN pip install --no-cache-dir trimesh urchin
+
+RUN source /opt/conda/etc/profile.d/conda.sh && conda activate grasp-data-collection
+
+RUN export PYTHONPATH="/grasp-data-collection/src:$PYTHONPATH";
+
+# RUN python convonet_setup.py build_ext --inplace;
 
 # Default shell
 CMD ["bash"]

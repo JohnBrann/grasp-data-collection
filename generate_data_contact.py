@@ -315,7 +315,7 @@ if __name__ == "__main__":
     parser.add_argument('--FilterSame', type=strToBool, default=True)
     parser.add_argument('--sample_num', type=int, default=20)
     parser.add_argument('--add_noise', type=strToBool, default=False)
-    parser.add_argument('--object_set', type=str, default='train')
+    parser.add_argument('--object-set', type=str, default='train')
     parser.add_argument('--save_scene', type=bool, default=True)
 
     args = parser.parse_args()
@@ -331,5 +331,11 @@ if __name__ == "__main__":
 
     scene = args.scene
     object_set = args.object_set
+
+
+    dataset_name = Path(args.object_set).name
+    print(f"args.root: {args.root}")
+    args.root = args.root / dataset_name
+    print(f"args.root: {args.root}")
 
     run(args, scene, object_set, ITERATIONNUM, PATH, start=START, GUI=GUI, n_intervals=n_intervals)
